@@ -33,6 +33,7 @@ end
 class('Computer').extends(Player)
 
 function Computer:init(speed, spritePath, startPosX, startPosY)
+  self.prevDir = 0
   Player.init(self, speed)
   Player.loadSprite(self, spritePath)
   Player.setStartPosition(self, startPosX, startPosY)
