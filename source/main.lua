@@ -9,16 +9,18 @@ local dsp<const> = playdate.display
 
 local centerX<const> = dsp.getWidth() / 2
 local centerY<const> = dsp.getHeight() / 2
+local playerSpriteHeight<const> = 50
 
 local fieldBoundary<const> = 30
+local maxGameSpeed<const> = 7
 
 local p1 = nil
 local ai = nil
 
 local ballSprite = nil
 
-local vx = math.random(2, 4)
-local vy = math.random(2, 4)
+local vx = math.random(3, maxGameSpeed)
+local vy = math.random(3, maxGameSpeed)
 
 local function initalize()
   math.randomseed(playdate.getSecondsSinceEpoch())
@@ -34,8 +36,8 @@ local function initalize()
 end
 
 function resetBall()
-  vx = math.random(3, 4) * (math.random(0, 1) == 0 and 1 or -1)
-  vy = math.random(3, 4) * (math.random(0, 1) == 0 and 1 or -1)
+  vx = math.random(3, maxGameSpeed) * (math.random(0, 1) == 0 and 1 or -1)
+  vy = math.random(3, maxGameSpeed) * (math.random(0, 1) == 0 and 1 or -1)
   ballSprite:moveTo(centerX, centerY)
 end
 
@@ -46,29 +48,40 @@ function playerOneInputHandler()
   if playdate.buttonIsPressed(playdate.kButtonUp) then
     if playerPos > fieldBoundary then
       p1:moveBy(0, -p1.speed)
+      if p1.speed < 10 then
+        p1.speed = p1.speed + 1
+      end
     end
   end
   if playdate.buttonIsPressed(playdate.kButtonDown) then
     if playerPos < (dsp.getHeight() - fieldBoundary) then
       p1:moveBy(0, p1.speed)
+      if p1.speed < 10 then
+        p1.speed = p1.speed + 1
+      end
     end
   end
+  if playdate.buttonJustReleased(playdate.kButtonUp) or
+      playdate.buttonJustReleased(playdate.kButtonDown) then
+    p1.speed = 5
+  end
+
   if playdate.buttonIsPressed(playdate.kButtonB) then
     resetBall()
   end
 end
 
 function moveAi()
-  if vx > 0 then
-    if vy > 0 then
-      if ai.sprite.y < ballSprite.y and ai.sprite.y <
-          (dsp.getHeight() - fieldBoundary) then
-        ai:moveBy(0, ai.speed)
-      end
-    else
-      if ai.sprite.y > ballSprite.y and ai.sprite.y > fieldBoundary then
-        ai:moveBy(0, -ai.speed)
-      end
+  ai.speed = math.random(3, maxGameSpeed)
+  if vy > 0 then
+    if ai.sprite.y < (ballSprite.y - fieldBoundary) and ai.sprite.y <
+        (dsp.getHeight() - fieldBoundary) then
+      ai:moveBy(0, ai.speed)
+    end
+  else
+    if ai.sprite.y > (ballSprite.y + fieldBoundary) and ai.sprite.y >
+        fieldBoundary then
+      ai:moveBy(0, -ai.speed)
     end
   end
 end
@@ -77,14 +90,31 @@ function moveBall()
   ballSprite:moveTo(ballSprite.x + vx, ballSprite.y + vy)
 end
 
-function checkCollision()
+function checkCollisions()
   if ballSprite.y <= 5 or ballSprite.y >= 235 then
     vy = -vy
   end
   local collisions = ballSprite:overlappingSprites()
-  -- add direction detection here to prevent glitches
   if #collisions >= 1 then
+    local collidingPlayer = collisions[1];
+    local ballY = ballSprite.y
+    local playerY = collidingPlayer.y
+    local dif = playerY - ballY
     vx = -vx
+    if dif > -8 and dif < 8 then
+    elseif dif > -18 and dif < 18 then
+      if (dif > 0) then
+        vy = dif / math.random(1, 3)
+      else
+        vy = dif / math.random(1, 3)
+      end
+    else
+      if (dif > 0) then
+        vy = -dif / math.random(4, maxGameSpeed)
+      else
+        vy = -dif / math.random(4, maxGameSpeed)
+      end
+    end
   end
 end
 
@@ -101,9 +131,9 @@ end
 
 function playdate.update()
   playerOneInputHandler()
-  checkCollision()
-  moveBall()
+  checkCollisions()
   moveAi()
+  moveBall()
   checkScore()
 
   playdate.timer.updateTimers()
