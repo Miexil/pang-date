@@ -2,12 +2,7 @@ import "CoreLibs/object"
 import "CoreLibs/graphics"
 import "CoreLibs/sprites"
 import "CoreLibs/timer"
-
--- easy -> follow dir of vx,vy 
--- medium -> calculate final position but partly :D
--- hard -> calculate final position
-
--- Every minute ball goes faster
+import "player"
 
 local gfx<const> = playdate.graphics
 local dsp<const> = playdate.display
@@ -15,35 +10,27 @@ local dsp<const> = playdate.display
 local centerX<const> = dsp.getWidth() / 2
 local centerY<const> = dsp.getHeight() / 2
 
-local playerSprite = nil
-local aiSprite = nil
-local playerSpeed = 5
+local fieldBoundary<const> = 30
+
+local p1 = nil
+local ai = nil
 
 local ballSprite = nil
-local p1Score = 0
-local p2Score = 0
 
 local vx = math.random(2, 4)
 local vy = math.random(2, 4)
 
 local function initalize()
   math.randomseed(playdate.getSecondsSinceEpoch())
-  local playerImage = gfx.image.new("images/plong-player")
-  playerSprite = gfx.sprite.new(playerImage)
-  playerSprite:moveTo(10, centerY)
-  playerSprite:setCollideRect(0, 0, playerSprite:getSize())
-  playerSprite:add()
-
-  aiSprite = gfx.sprite.new(playerImage)
-  aiSprite:moveTo(390, centerY)
-  aiSprite:setCollideRect(0, 0, aiSprite:getSize())
-  aiSprite:add()
+  p1 = Human(5, "images/plong-player", 10, centerY)
+  ai = Computer(5, "images/plong-player", 390, centerY)
 
   ballSprite = gfx.sprite.new(gfx.image.new("images/plong-ball"))
   ballSprite:setCollideRect(0, 0, ballSprite:getSize())
   ballSprite:add()
 
   playdate.display.setInverted(true)
+  resetBall()
 end
 
 function resetBall()
@@ -53,18 +40,17 @@ function resetBall()
 end
 
 initalize()
-resetBall()
 
 function playerOneInputHandler()
-  local playerPos = playerSprite.y;
+  local playerPos = p1.sprite.y;
   if playdate.buttonIsPressed(playdate.kButtonUp) then
-    if playerPos > 30 then
-      playerSprite:moveBy(0, -playerSpeed)
+    if playerPos > fieldBoundary then
+      p1:moveBy(0, -p1.speed)
     end
   end
   if playdate.buttonIsPressed(playdate.kButtonDown) then
-    if playerPos < 210 then
-      playerSprite:moveBy(0, playerSpeed)
+    if playerPos < (dsp.getHeight() - fieldBoundary) then
+      p1:moveBy(0, p1.speed)
     end
   end
   if playdate.buttonIsPressed(playdate.kButtonB) then
@@ -75,12 +61,13 @@ end
 function moveAi()
   if vx > 0 then
     if vy > 0 then
-      if aiSprite.y < ballSprite.y and aiSprite.y < 210 then
-        aiSprite:moveBy(0, playerSpeed)
+      if ai.sprite.y < ballSprite.y and ai.sprite.y <
+          (dsp.getHeight() - fieldBoundary) then
+        ai:moveBy(0, ai.speed)
       end
     else
-      if aiSprite.y > ballSprite.y and aiSprite.y > 30 then
-        aiSprite:moveBy(0, -playerSpeed)
+      if ai.sprite.y > ballSprite.y and ai.sprite.y > fieldBoundary then
+        ai:moveBy(0, -ai.speed)
       end
     end
   end
@@ -103,11 +90,11 @@ end
 
 function checkScore()
   if ballSprite.x <= 5 then
-    p2Score = p2Score + 1
+    ai.score = ai.score + 1
     resetBall()
   end
   if ballSprite.x >= 395 then
-    p1Score = p1Score + 1
+    p1.score = p1.score + 1
     resetBall()
   end
 end
@@ -122,6 +109,6 @@ function playdate.update()
   playdate.timer.updateTimers()
   gfx.sprite.update()
 
-  gfx.drawText(p1Score, centerX - (centerX / 2), 5)
-  gfx.drawText(p2Score, centerX + (centerX / 2), 5)
+  gfx.drawText(p1.score, centerX - (centerX / 2), 5)
+  gfx.drawText(ai.score, centerX + (centerX / 2), 5)
 end
