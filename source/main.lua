@@ -38,7 +38,7 @@ function setupGameAndStart(p1Dif, p2Dif)
   elseif p1Dif == 2 then
     p1 = Computer(1, 15, "images/plong-player", 5, centerY, 25, 1) -- EASY
   elseif p1Dif == 3 then
-    p1 = Computer(1, 15, "images/plong-player", 10, centerY, 1, 2) -- MEDIUM
+    p1 = Computer(1, 15, "images/plong-player", 10, centerY, 15, 2) -- MEDIUM
   end
   
   if p2Dif == 1 then
@@ -46,7 +46,7 @@ function setupGameAndStart(p1Dif, p2Dif)
   elseif p2Dif == 2 then
     p2 = Computer(1, 15, "images/plong-player", 395, centerY, 25, 1) -- EASY
   elseif p2Dif == 3 then
-    p2 = Computer(1, 20, "images/plong-player", 395, centerY, 1, 2) -- MEDIUM
+    p2 = Computer(1, 20, "images/plong-player", 395, centerY, 15, 2) -- MEDIUM
   end
 
   gameReady = true
@@ -135,6 +135,31 @@ function drawScore()
   gfx.drawText(p2.score, centerX + (centerX / 2), 5)
 end
 
+function dottedLine(x1, y1, x2, y2, size, interval)
+    local size = size or 5
+    local interval = interval or 2
+
+    local dx = (x1-x2)*(x1-x2)
+    local dy = (y1-y2)*(y1-y2)
+    local length = math.sqrt(dx+dy)
+    local t = size/interval
+
+    for i = 1, math.floor(length/size) do
+        if i % interval == 0 then
+            gfx.drawLine(x1+t*(i-1)*(x2-x1), y1+t*(i-1)*(y2-y1),
+                               x1+t*i*(x2-x1), y1*t*i*(y2-y1))
+        end
+    end
+end
+
+function drawFieldSeparator()
+  gfx.setLineWidth(4)
+
+  for i = 2, dsp.getHeight(), 25 do
+    gfx.drawLine(centerX, i, centerX, i + 10)
+  end
+end
+
 function gameLoop()
   checkCollisions()
   p1:handleMovement(vx, vy, ballSprite)
@@ -151,6 +176,7 @@ function gameLoop()
     gfx.drawText('*Round ' .. round .. '*', centerX - 30, centerY + 50)
     playdate.wait(1500)
   end
+  drawFieldSeparator()
 end
 
 function playdate.update()
@@ -159,7 +185,7 @@ function playdate.update()
   else
     gameMenu()
   end
-  playdate.drawFPS(0,0)
+  -- playdate.drawFPS(0,0)
 end
 
 init()
