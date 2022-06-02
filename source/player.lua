@@ -3,6 +3,7 @@ import "CoreLibs/object"
 local gfx<const> = playdate.graphics
 local dsp<const> = playdate.display
 local playerHeight<const> = 25
+local twoHumanGame = false
 
 class('Player').extends()
 
@@ -47,13 +48,25 @@ end
 
 class('Human').extends(Player)
 
-function Human:init(minSpeed, maxSpeed, spritePath, startPosX, startPosY)
+function Human:init(minSpeed, maxSpeed, spritePath, startPosX, startPosY, disablePad)
+  self.disablePad = disablePad or false
   self.speedVelocity = 1
   Human.super.init(self, minSpeed, minSpeed, maxSpeed)
   Human.loadSprite(self, spritePath)
   Human.setStartPosition(self, startPosX, startPosY)
 end
 function Human:handleMovement()
+  local myInputHandlers = {
+    cranked = function(change, acceleratedChange)
+      if (change > 0) then
+        self:moveBy(0, change, 'down')
+      else
+        self:moveBy(0, change, 'up')
+      end
+    end
+  }
+  playdate.inputHandlers.push(myInputHandlers)
+  if (self.disablePad) then return end
   if playdate.buttonIsPressed(playdate.kButtonUp) then
     self:setSpeed(self.prevDir, -1)
     self:moveBy(0, -self.speed, 'up')

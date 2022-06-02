@@ -44,7 +44,7 @@ function setupGameAndStart(p1Dif, p2Dif)
   end
 
   if p2Dif == 1 then
-    p2 = Human(1, 15, "images/plong-player", 395, centerY)
+    p2 = Human(1, 15, "images/plong-player", 395, centerY, p1Dif == 1 and true or false)
   elseif p2Dif == 2 then
     p2 = Computer(1, 15, "images/plong-player", 395, centerY, 25, 1) -- EASY
   elseif p2Dif == 3 then

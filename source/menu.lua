@@ -141,6 +141,7 @@ function handleInput()
 end
 
 function cleanUp()
+  humanPlayers = 0
   p1.score = 0
   p2.score = 0
   round = 0
