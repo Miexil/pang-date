@@ -1,2 +1,2 @@
-# pong-date
-Classic Pong game for the PlayDate
+# pang-date
+Remake of a classic arcade game.

@@ -23,6 +23,9 @@ function Player:setStartPosition(x, y)
   self.sprite:moveTo(x, y)
   self.sprite:add()
 end
+function Player:remove()
+    self.sprite:remove()
+end
 function Player:moveBy(x, y, dir)
   if (dir == 'up' and self.sprite.y + y > (playerHeight / 5)) or
       (dir == 'down' and self.sprite.y + y <

@@ -1,6 +1,6 @@
-name=Pong.date
+name=Pang.date
 author=Maximilien Brunelle
-description=A retake on the classic Atari Pong
-bundleID=com.nomad-technologies.pong-date
+description=A remake of a classic arcade game
+bundleID=tech.digital-nomad.pang-date
 version=0.8.1
 imagePath=images

@@ -11,7 +11,7 @@ local p1Selection, p2Selection = 1, 3
 local cursorOptions = {'player1', 'player2', 'start'}
 local cursorSelected = 3
 
-local pongLogo = nil
+local pangLogo = nil
 local dateLogo = nil
 
 local function loadSprites()
@@ -25,11 +25,11 @@ local function loadSprites()
   p2Cr = gfx.sprite.new(chevronLeftImg)
   p2Cr:setImageFlip(1)
 
-  pongLogo = gfx.sprite.new(gfx.image.new("images/ponglogo"))
+  pangLogo = gfx.sprite.new(gfx.image.new("images/panglogo"))
   dateLogo = gfx.sprite.new(gfx.image.new("images/datelogo"))
-  pongLogo:moveTo(centerX, centerY - 60);
+  pangLogo:moveTo(centerX, centerY - 60);
   dateLogo:moveTo(centerX + 99, centerY - 42);
-  pongLogo:add()
+  pangLogo:add()
   dateLogo:add()
 end
 
@@ -107,7 +107,7 @@ function removeAssets()
   p1Cr:remove()
   p2Cl:remove()
   p2Cr:remove()
-  pongLogo:remove()
+  pangLogo:remove()
   dateLogo:remove()
 end
 
@@ -139,6 +139,20 @@ function handleInput()
       setupGameAndStart(p1Selection, p2Selection)
     end
   end
+end
+
+function setMenuItems()
+  local menu = playdate.getSystemMenu()
+  menu:addMenuItem("Main menu", function()
+    gameReady = false
+    gfx.clear()
+    ballSprite:remove()
+    p1:remove()
+    p2:remove()
+    pangLogo:add()
+    dateLogo:add()
+    gameMenu()
+  end)
 end
 
 function gameMenu()

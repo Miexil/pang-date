@@ -15,10 +15,10 @@ local playerSpriteHeight<const> = 50
 fieldBoundary = 30
 maxGameSpeed = 6
 
-local p1 = nil
-local p2 = nil
+p1 = nil
+p2 = nil
 
-local ballSprite = nil
+ballSprite = nil
 
 local vx = nil
 local vy = nil
@@ -27,9 +27,11 @@ local round = 0
 gameReady = false
 
 local function init()
+  setMenuItems()
   math.randomseed(playdate.getSecondsSinceEpoch())
-  playdate.display.setInverted(true)
-  playdate.graphics.setImageDrawMode(playdate.graphics.kDrawModeNXOR)
+  dsp.setInverted(true)
+  gfx.setImageDrawMode(playdate.graphics.kDrawModeNXOR)
+  playdate.setMenuImage(gfx.image.new("images/pause-menu"))
 end
 
 function setupGameAndStart(p1Dif, p2Dif)
