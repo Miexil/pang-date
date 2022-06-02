@@ -17,14 +17,14 @@ maxGameSpeed = 6
 
 p1 = nil
 p2 = nil
-
 ballSprite = nil
 
+round = 0
+gameReady = false
+
+local maxRounds = 11
 local vx = nil
 local vy = nil
-
-local round = 0
-gameReady = false
 
 local function init()
   setMenuItems()
@@ -42,9 +42,9 @@ function setupGameAndStart(p1Dif, p2Dif)
   elseif p1Dif == 3 then
     p1 = Computer(1, 15, "images/plong-player", 10, centerY, 15, 2) -- MEDIUM
   end
-  
+
   if p2Dif == 1 then
-    p2 = Human(1, 15, "images/plong-player",  395, centerY)
+    p2 = Human(1, 15, "images/plong-player", 395, centerY)
   elseif p2Dif == 2 then
     p2 = Computer(1, 15, "images/plong-player", 395, centerY, 25, 1) -- EASY
   elseif p2Dif == 3 then
@@ -79,29 +79,24 @@ function checkCollisions()
     local dif = collidingPlayer.y - ballSprite.y
     vx = -vx
     if (vx < 0 and ballSprite.x > 0 and ballSprite.x < (centerX / 2)) then
-      print('early return')
       return
     end
     if (vx > 0 and ballSprite.x < 0 and ballSprite.x > (centerX / 2)) then
-      print('early return')
       return
     end
     if dif > -4 and dif < 4 then
-      print('middle')
       if vy > 0 then
         vy = math.random(0, 1)
       else
         vy = -math.random(0, 1)
       end
     elseif dif > -18 and dif < 18 then
-      print('middle-edge')
       if dif < 0 then
         vy = math.abs(vy + math.random(1, 3))
       else
         vy = -math.abs(vy - math.random(1, 3))
       end
     else
-      print('edge')
       if dif < 0 then
         vy = math.abs(vy + math.random(4, 6))
       else
@@ -114,7 +109,7 @@ end
 function resetRound()
   resetBall()
   gfx.sprite.update()
-  drawScore();
+  drawScore()
   gfx.drawText('*Round ' .. round .. '*', centerX - 30, centerY + 50)
   playdate.wait(1500)
 end
@@ -123,12 +118,32 @@ function checkScore()
   if ballSprite.x <= 5 then
     p2.score = p2.score + 1
     round = round + 1
+    if (checkEndGame() == true) then return true end
     resetRound()
   end
   if ballSprite.x >= 395 then
     p1.score = p1.score + 1
     round = round + 1
+    if (checkEndGame() == true) then return true end
     resetRound()
+  end
+  return false
+end
+
+function checkEndGame()
+  if (p1.score == maxRounds or p2.score == maxRounds) then
+    gfx.sprite.update()
+    drawScore()
+    gameReady = false
+    if p1.score == 3 then
+      gfx.drawText('*P1 wins!*', centerX - 30, centerY + 50)
+    else
+      gfx.drawText('*P2 wins!*', centerX - 30, centerY + 50)
+    end
+    playdate.wait(2500)
+    cleanUp()
+    gameMenu()
+    return true;
   end
 end
 
@@ -138,28 +153,26 @@ function drawScore()
 end
 
 function dottedLine(x1, y1, x2, y2, size, interval)
-    local size = size or 5
-    local interval = interval or 2
+  local size = size or 5
+  local interval = interval or 2
 
-    local dx = (x1-x2)*(x1-x2)
-    local dy = (y1-y2)*(y1-y2)
-    local length = math.sqrt(dx+dy)
-    local t = size/interval
+  local dx = (x1 - x2) * (x1 - x2)
+  local dy = (y1 - y2) * (y1 - y2)
+  local length = math.sqrt(dx + dy)
+  local t = size / interval
 
-    for i = 1, math.floor(length/size) do
-        if i % interval == 0 then
-            gfx.drawLine(x1+t*(i-1)*(x2-x1), y1+t*(i-1)*(y2-y1),
-                               x1+t*i*(x2-x1), y1*t*i*(y2-y1))
-        end
+  for i = 1, math.floor(length / size) do
+    if i % interval == 0 then
+      gfx.drawLine(x1 + t * (i - 1) * (x2 - x1), y1 + t * (i - 1) * (y2 - y1),
+                   x1 + t * i * (x2 - x1), y1 * t * i * (y2 - y1))
     end
+  end
 end
 
 function drawFieldSeparator()
   gfx.setLineWidth(4)
 
-  for i = 2, dsp.getHeight(), 25 do
-    gfx.drawLine(centerX, i, centerX, i + 10)
-  end
+  for i = 2, dsp.getHeight(), 25 do gfx.drawLine(centerX, i, centerX, i + 10) end
 end
 
 function gameLoop()
@@ -167,11 +180,11 @@ function gameLoop()
   p1:handleMovement(vx, vy, ballSprite)
   p2:handleMovement(vx, vy, ballSprite)
   moveBall()
-  checkScore()
-
+  if (checkScore() == true) then return end
   playdate.timer.updateTimers()
   gfx.sprite.update()
   drawScore()
+
   if playdate.buttonIsPressed(playdate.kButtonB) then resetBall() end
   if (round == 0) then
     round = round + 1

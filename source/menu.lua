@@ -86,7 +86,6 @@ function cursorNext()
 end
 
 function selectPlayerDifficultyPrev(pSelection)
-  print(pSelection)
   if pSelection == 1 then
     return 4
   else
@@ -141,16 +140,23 @@ function handleInput()
   end
 end
 
+function cleanUp()
+  p1.score = 0
+  p2.score = 0
+  round = 0
+  gameReady = false
+  gfx.clear()
+  ballSprite:remove()
+  p1:remove()
+  p2:remove()
+  pangLogo:add()
+  dateLogo:add()
+end
+
 function setMenuItems()
   local menu = playdate.getSystemMenu()
   menu:addMenuItem("Main menu", function()
-    gameReady = false
-    gfx.clear()
-    ballSprite:remove()
-    p1:remove()
-    p2:remove()
-    pangLogo:add()
-    dateLogo:add()
+    cleanUp()
     gameMenu()
   end)
 end
