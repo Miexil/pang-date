@@ -142,14 +142,16 @@ end
 
 function cleanUp()
   humanPlayers = 0
-  p1.score = 0
-  p2.score = 0
+  if (p1 and p2) then
+    p1.score = 0
+    p2.score = 0
+    ballSprite:remove()
+    p1:remove()
+    p2:remove()
+  end
   round = 0
   gameReady = false
   gfx.clear()
-  ballSprite:remove()
-  p1:remove()
-  p2:remove()
   pangLogo:add()
   dateLogo:add()
 end

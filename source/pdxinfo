@@ -1,6 +1,6 @@
 name=Pang.date
-author=Maximilien Brunelle
-description=A remake of a classic arcade game
+author=DigitalNomad
+description=A remake of the classic arcade game
 bundleID=tech.digital-nomad.pang-date
-version=0.8.1
+version=0.8.2
 imagePath=images

@@ -1,2 +1,2 @@
 # pang-date
-Remake of a classic arcade game.
+Remake of the classic 70s arcade game.

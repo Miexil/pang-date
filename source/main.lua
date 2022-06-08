@@ -21,12 +21,14 @@ ballSprite = nil
 
 round = 0
 gameReady = false
+synth = nil
 
 local maxRounds = 11
 local vx = nil
 local vy = nil
 
 local function init()
+  initSound()
   setMenuItems()
   math.randomseed(playdate.getSecondsSinceEpoch())
   dsp.setInverted(true)
@@ -34,13 +36,19 @@ local function init()
   playdate.setMenuImage(gfx.image.new("images/pause-menu"))
 end
 
+function initSound()
+  synth = playdate.sound.synth.new(playdate.sound.kWaveTriangle)
+end
+
 function setupGameAndStart(p1Dif, p2Dif)
   if p1Dif == 1 then
-    p1 = Human(1, 15, "images/plong-player", 10, centerY)
+    p1 = Human(5, 15, "images/plong-player", 5, centerY)
   elseif p1Dif == 2 then
     p1 = Computer(1, 15, "images/plong-player", 5, centerY, 25, 1) -- EASY
   elseif p1Dif == 3 then
-    p1 = Computer(1, 15, "images/plong-player", 10, centerY, 15, 2) -- MEDIUM
+    p1 = Computer(1, 15, "images/plong-player", 5, centerY, 15, 2) -- MEDIUM
+  elseif p1Dif == 4 then
+    p1 = Computer(1, 35, "images/plong-player", 5, centerY, 10, 2) -- HARD
   end
 
   if p2Dif == 1 then
@@ -49,6 +57,8 @@ function setupGameAndStart(p1Dif, p2Dif)
     p2 = Computer(1, 15, "images/plong-player", 395, centerY, 25, 1) -- EASY
   elseif p2Dif == 3 then
     p2 = Computer(1, 20, "images/plong-player", 395, centerY, 15, 2) -- MEDIUM
+  elseif p2Dif == 4 then
+    p2 = Computer(1, 35, "images/plong-player", 395, centerY, 10, 2) -- HARD
   end
 
   gameReady = true
@@ -70,8 +80,10 @@ function checkCollisions()
   -- print('ball x : ' .. ballSprite.x .. ' y : ' .. ballSprite.y .. ' vx : ' .. vx .. ' vy : ' .. vy)
   if ballSprite.y <= 5 then
     vy = math.abs(vy)
+    synth:playNote("D5", .5, .1)
   elseif ballSprite.y >= 235 then
     vy = -math.abs(vy)
+    synth:playNote("D5", .5, .1)
   end
   local collisions = ballSprite:overlappingSprites()
   if #collisions >= 1 then
@@ -90,18 +102,21 @@ function checkCollisions()
       else
         vy = -math.random(0, 1)
       end
+      synth:playNote("D4", .5, .1)
     elseif dif > -18 and dif < 18 then
       if dif < 0 then
         vy = math.abs(vy + math.random(1, 3))
       else
         vy = -math.abs(vy - math.random(1, 3))
       end
+      synth:playNote("D4", .5, .1)
     else
       if dif < 0 then
         vy = math.abs(vy + math.random(4, 6))
       else
         vy = -math.abs(vy - math.random(4, 6))
       end
+      synth:playNote("D4", .5, .1)
     end
   end
 end
