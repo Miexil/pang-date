@@ -4,6 +4,7 @@ local centerX<const> = dsp.getWidth() / 2
 local centerY<const> = dsp.getHeight() / 2
 
 local p1Cl, p1Cr, p2Cl, p2Cr = nil
+local p1label, p2label = nil
 local selectorRadius = 8
 local levelLabels = {'Human', 'AI - Easy', 'AI - Medium', 'AI - Hard'}
 
@@ -29,8 +30,30 @@ local function loadSprites()
   dateLogo = gfx.sprite.new(gfx.image.new("images/datelogo"))
   pangLogo:moveTo(centerX, centerY - 60);
   dateLogo:moveTo(centerX + 99, centerY - 42);
+
+  p1label = gfx.sprite.new()
+  p1text = gfx.image.new(100, 20)
+  gfx.pushContext(p1text)
+  gfx.drawText('player 1', 0, 0)
+  gfx.popContext()
+  p1label:setImage(p1text)
+  p1label:moveTo(centerX - 55, centerY + 20)
+
+  p2label = gfx.sprite.new()
+  p2text = gfx.image.new(100, 20)
+  gfx.pushContext(p2text)
+  gfx.drawText('player 2', 0, 0)
+  gfx.popContext()
+  p2label:setImage(p2text)
+  p2label:moveTo(centerX - 55, centerY + 50)
+  drawStaticAssets()
+end
+
+function drawStaticAssets()
   pangLogo:add()
   dateLogo:add()
+  p1label:add()
+  p2label:add()
 end
 
 function drawP1DifficultySelector(text, x, y)
@@ -50,13 +73,10 @@ function drawP2DifficultySelector(text, x, y)
 end
 
 function drawOptions()
-  gfx.drawText('player 1', centerX - 110, centerY + 10)
   if (cursorOptions[cursorSelected] == 'player1') then
     gfx.fillRect(centerX + 5, centerY + 8, 90, 22)
   end
   drawP1DifficultySelector(levelLabels[p1Selection], centerX + 50, centerY + 10)
-
-  gfx.drawText('player 2', centerX - 110, centerY + 40)
   if (cursorOptions[cursorSelected] == 'player2') then
     gfx.fillRect(centerX + 5, centerY + 38, 90, 22)
   end
@@ -106,6 +126,8 @@ function removeAssets()
   p1Cr:remove()
   p2Cl:remove()
   p2Cr:remove()
+  p1label:remove()
+  p2label:remove()
   pangLogo:remove()
   dateLogo:remove()
 end
@@ -152,15 +174,13 @@ function cleanUp()
   round = 0
   gameReady = false
   gfx.clear()
-  pangLogo:add()
-  dateLogo:add()
+  drawStaticAssets()
 end
 
 function setMenuItems()
   local menu = playdate.getSystemMenu()
   menu:addMenuItem("Main menu", function()
     cleanUp()
-    gameMenu()
   end)
 end
 
