@@ -183,7 +183,7 @@ function gameLoop()
   gfx.sprite.update()
   drawScore()
 
-  if playdate.buttonIsPressed(playdate.kButtonB) then resetBall() end
+  -- if playdate.buttonIsPressed(playdate.kButtonB) then resetBall() end
   if (round == 0) then
     round = round + 1
     gfx.drawText('*Round ' .. round .. '*', centerX - 30, centerY + 50)

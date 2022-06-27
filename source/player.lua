@@ -24,9 +24,7 @@ function Player:setStartPosition(x, y)
   self.sprite:moveTo(x, y)
   self.sprite:add()
 end
-function Player:remove()
-    self.sprite:remove()
-end
+function Player:remove() self.sprite:remove() end
 function Player:moveBy(x, y, dir)
   if (dir == 'up' and self.sprite.y + y > (playerHeight / 5)) or
       (dir == 'down' and self.sprite.y + y <
@@ -48,7 +46,8 @@ end
 
 class('Human').extends(Player)
 
-function Human:init(minSpeed, maxSpeed, spritePath, startPosX, startPosY, disablePad)
+function Human:init(minSpeed, maxSpeed, spritePath, startPosX, startPosY,
+                    disablePad)
   self.disablePad = disablePad or false
   self.speedVelocity = 1
   Human.super.init(self, minSpeed, minSpeed, maxSpeed)
@@ -66,12 +65,27 @@ function Human:handleMovement()
     end
   }
   playdate.inputHandlers.push(myInputHandlers)
-  if (self.disablePad) then return end
-  if playdate.buttonIsPressed(playdate.kButtonUp) then
+  if (self.disablePad) then
+    if playdate.buttonIsPressed(playdate.kButtonB) then
+      self:setSpeed(self.prevDir, -1)
+      self:moveBy(0, -self.speed, 'up')
+      self.prevDir = -1
+    elseif playdate.buttonIsPressed(playdate.kButtonA) then
+      self:setSpeed(self.prevDir, 1)
+      self:moveBy(0, self.speed, 'down')
+      self.prevDir = 1
+    else
+      self.speed = self.minSpeed
+    end
+    return
+  end
+  if playdate.buttonIsPressed(playdate.kButtonUp) or
+      (self.disablePad and playdate.buttonIsPressed(playdate.kButtonA)) then
     self:setSpeed(self.prevDir, -1)
     self:moveBy(0, -self.speed, 'up')
     self.prevDir = -1
-  elseif playdate.buttonIsPressed(playdate.kButtonDown) then
+  elseif playdate.buttonIsPressed(playdate.kButtonDown) or
+      (self.disablePad and playdate.buttonIsPressed(playdate.kButtonB)) then
     self:setSpeed(self.prevDir, 1)
     self:moveBy(0, self.speed, 'down')
     self.prevDir = 1

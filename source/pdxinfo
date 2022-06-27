@@ -2,5 +2,5 @@ name=Pang.date
 author=DigitalNomad
 description=A remake of the classic 70s arcade game
 bundleID=tech.digital-nomad.pang-date
-version=0.9.2
+version=0.10.0
 imagePath=images
